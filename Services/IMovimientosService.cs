@@ -7,5 +7,6 @@ namespace Ferreteri.Services
         Task<int> GetCount();
         Task<List<Movimiento>> GetAll();
         Task<List<Movimiento>> GetByTipo(string tipo);
+        Task<int> AddMovimiento(Movimiento movimiento);
     }
 }

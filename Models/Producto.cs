@@ -17,5 +17,5 @@ public partial class Producto
 
     public virtual Categoria? FkIdCategoriaNavigation { get; set; }
 
-    public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
+    public virtual ICollection<Movimiento>? Movimientos { get; set; } = new List<Movimiento>();
 }

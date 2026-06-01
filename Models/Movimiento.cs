@@ -15,5 +15,5 @@ public partial class Movimiento
 
     public DateOnly Fecha { get; set; }
 
-    public virtual Producto FkIdProdNavigation { get; set; } = null!;
+    public virtual Producto? FkIdProdNavigation { get; set; }
 }
