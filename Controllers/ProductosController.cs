@@ -22,6 +22,7 @@ namespace Ferreteri.Controllers
             var count = await _productosService.GetCount();
             return Ok(count);
         }
+
         [HttpGet]
         [Route("listar")]
         public async Task<IActionResult> ListarProductos()
@@ -29,26 +30,58 @@ namespace Ferreteri.Controllers
             var productos = await _productosService.ListarProductos();
             return Ok(productos);
         }
+
         [HttpPost]
         [Route("add")]
         public async Task<IActionResult> AddProducto([FromBody] Models.Producto producto)
         {
-            var filasAfectadas = await _productosService.AddProducto(producto);
-            return Ok(filasAfectadas);
+            try
+            {
+                var filasAfectadas = await _productosService.AddProducto(producto);
+                return Ok(filasAfectadas);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
+
         [HttpPut]
         [Route("update")]
         public async Task<IActionResult> UpdateProducto([FromBody] Models.Producto producto)
         {
-            var filasAfectadas = await _productosService.UpdateProducto(producto);
-            return Ok(filasAfectadas);
+            try
+            {
+                var filasAfectadas = await _productosService.UpdateProducto(producto);
+                if (filasAfectadas == 0)
+                {
+                    return NotFound(new { mensaje = "El producto que intenta actualizar no existe." });
+                }
+                return Ok(filasAfectadas);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
+
         [HttpDelete]
         [Route("remove/{id}")]
         public async Task<IActionResult> RemoveProducto(int id)
         {
-            var filasAfectadas = await _productosService.RemoveProducto(id);
-            return Ok(filasAfectadas);
+            try
+            {
+                var filasAfectadas = await _productosService.RemoveProducto(id);
+                if (filasAfectadas == 0)
+                {
+                    return NotFound(new { mensaje = "El producto que intenta eliminar no existe." });
+                }
+                return Ok(filasAfectadas);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { mensaje = ex.Message });
+            }
         }
     }
 }

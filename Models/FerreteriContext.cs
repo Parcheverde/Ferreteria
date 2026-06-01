@@ -21,12 +21,19 @@ public partial class FerreteriContext : DbContext
 
     public virtual DbSet<Producto> Productos { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) { }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Server=DESKTOP-T0UEGO2;Database=FERRETERI;Trusted_Connection=True;TrustServerCertificate=True;");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Categoria>(entity =>
         {
+            entity.ToTable("Categorias");
             entity.HasKey(e => e.IdCategoria).HasName("PK__Categori__8A3D240C91108C2B");
 
             entity.Property(e => e.IdCategoria).HasColumnName("idCategoria");
@@ -37,6 +44,7 @@ public partial class FerreteriContext : DbContext
 
         modelBuilder.Entity<Movimiento>(entity =>
         {
+            entity.ToTable("Movimientos");
             entity.HasKey(e => e.IdMov).HasName("PK__Movimien__3DC69A4F5619E720");
 
             entity.Property(e => e.IdMov).HasColumnName("idMov");
@@ -56,6 +64,7 @@ public partial class FerreteriContext : DbContext
 
         modelBuilder.Entity<Producto>(entity =>
         {
+            entity.ToTable("Productos");
             entity.HasKey(e => e.IdProd).HasName("PK__Producto__B41BB0CAED90ABB0");
 
             entity.Property(e => e.IdProd).HasColumnName("idProd");

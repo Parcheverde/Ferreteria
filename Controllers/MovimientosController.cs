@@ -42,6 +42,20 @@ namespace Ferreteri.Controllers
 
             return Ok(movimientos);
         }
-    
+
+        [HttpPost]
+        public async Task<IActionResult> AddMovimiento([FromBody] Movimiento movimiento)
+        {
+            try
+            {
+                var filasAfectadas = await _movimientosService.AddMovimiento(movimiento);
+                return Ok(filasAfectadas);
+            }
+            catch (Exception ex)
+            {
+                // Si no hay stock suficiente, capturará el error del service y enviará el mensaje controlado
+                return BadRequest(new { mensaje = ex.Message });
+            }
+        }
     }
 }

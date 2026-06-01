@@ -19,6 +19,22 @@ namespace Ferreteri.Services
 
         public async Task<int> AddProducto(Producto producto)
         {
+            if (string.IsNullOrWhiteSpace(producto.Nombre))
+                throw new ArgumentException("El nombre del producto no puede estar vacío.");
+
+            if (producto.Precio <= 0)
+                throw new ArgumentException("El precio del producto debe ser un valor mayor a cero.");
+
+            if (producto.Stock < 0)
+                throw new ArgumentException("El stock inicial del producto no puede ser un número negativo.");
+
+            var categoriaExiste = await _context.Categorias.AnyAsync(c => c.IdCategoria == producto.FkIdCategoria);
+            if (!categoriaExiste)
+                throw new KeyNotFoundException("La categoría asignada al producto no existe en la base de datos.");
+
+            producto.FkIdCategoriaNavigation = null;
+            producto.Movimientos = null;
+
             await _dbSet.AddAsync(producto);
             await _context.SaveChangesAsync();
 
@@ -27,7 +43,8 @@ namespace Ferreteri.Services
                 FkIdProd = producto.IdProd,
                 TipoMov = "CREACION".ToLowerInvariant(),
                 Cantidad = producto.Stock ?? 0,
-                Fecha = DateOnly.FromDateTime(DateTime.Now)
+                Fecha = DateOnly.FromDateTime(DateTime.Now),
+                FkIdProdNavigation = null
             };
 
             await _movimientosDbSet.AddAsync(movimiento);
@@ -41,7 +58,7 @@ namespace Ferreteri.Services
 
         public async Task<List<Producto>> ListarProductos()
         {
-            return await _dbSet.ToListAsync();
+            return await _dbSet.Include(p => p.FkIdCategoriaNavigation).ToListAsync();
         }
 
         public async Task<int> RemoveProducto(int id)
@@ -50,22 +67,41 @@ namespace Ferreteri.Services
             if (producto == null)
                 return 0;
 
-            var movimiento = new Movimiento
+            // Validamos que no tenga transacciones de compras/ventas reales
+            var tieneMovimientosReales = await _context.Movimientos.AnyAsync(m => m.FkIdProd == id && m.TipoMov != "creacion");
+            if (tieneMovimientosReales)
             {
-                FkIdProd = producto.IdProd,
-                TipoMov = "ELIMINACION".ToLowerInvariant(),
-                Cantidad = producto.Stock ?? 0,
-                Fecha = DateOnly.FromDateTime(DateTime.Now)
-            };
+                throw new InvalidOperationException("No se puede eliminar el producto porque ya cuenta con transacciones de inventario operativas.");
+            }
 
-            await _movimientosDbSet.AddAsync(movimiento);
+            var movimientosDeCreacion = await _context.Movimientos.Where(m => m.FkIdProd == id && m.TipoMov == "creacion").ToListAsync();
+            if (movimientosDeCreacion.Any())
+            {
+                _context.Movimientos.RemoveRange(movimientosDeCreacion);
+            }
 
+            // Desvinculamos las listas virtuales de C# por seguridad
+            producto.Movimientos = null;
+            producto.FkIdCategoriaNavigation = null;
+
+            //Eliminamos el producto de forma limpia
             _dbSet.Remove(producto);
+
+            //Guardamos los cambios de una sola vez
             return await _context.SaveChangesAsync();
         }
 
         public async Task<int> UpdateProducto(Producto producto)
         {
+            if (string.IsNullOrWhiteSpace(producto.Nombre))
+                throw new ArgumentException("El nombre del producto no puede quedar vacío.");
+
+            if (producto.Precio <= 0)
+                throw new ArgumentException("El precio modificado debe ser un valor mayor a cero.");
+
+            if (producto.Stock < 0)
+                throw new ArgumentException("El stock no puede modificarse a un valor negativo.");
+
             var productoActual = await _dbSet.FirstOrDefaultAsync(p => p.IdProd == producto.IdProd);
             if (productoActual == null)
                 return 0;
