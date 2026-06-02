@@ -1,16 +1,15 @@
-# Ferretería API - ASP.NET Core 8 + SQL Server
+# Ferretería API - ASP.NET Core 8 + MySQL
 
-API REST desarrollada con ASP.NET Core 8 y SQL Server para la gestión de una ferretería.
+API REST desarrollada con ASP.NET Core 8 y MySQL para la gestión de una ferretería.
 
-El proyecto permite administrar categorías, productos y registrar movimientos relacionados con el inventario.
+Permite administrar categorías, productos y movimientos de inventario.
 
 ## Tecnologías Utilizadas
 
 * ASP.NET Core 8
 * Entity Framework Core
-* SQL Server
+* MySQL / MariaDB
 * Swagger / OpenAPI
-* Dependency Injection
 * C#
 
 ---
@@ -20,14 +19,12 @@ El proyecto permite administrar categorías, productos y registrar movimientos r
 ### Categorías
 
 * Listar categorías
-* Obtener cantidad de categorías registradas
 * Agregar categorías
 * Eliminar categorías
 
 ### Productos
 
 * Listar productos
-* Obtener cantidad de productos
 * Agregar productos
 * Actualizar productos
 * Eliminar productos
@@ -35,7 +32,6 @@ El proyecto permite administrar categorías, productos y registrar movimientos r
 ### Movimientos
 
 * Consultar historial de movimientos
-* Obtener cantidad de movimientos registrados
 * Filtrar movimientos por tipo
 
 ---
@@ -48,33 +44,36 @@ Ferreteri/
 ├── Controllers/
 ├── Models/
 ├── Services/
-├── Data/
 ├── appsettings.json
 ├── Program.cs
+├── BDScript.sql
 └── README.md
 ```
-
----
-## DIAGRAMA BD
-<img width="682" height="528" alt="image" src="https://github.com/user-attachments/assets/83e09512-2e4f-4494-93b8-f09d19e9b74f" />
 
 ---
 
 ## Requisitos
 
 * .NET 8 SDK
-* SQL Server
+* MySQL o MariaDB
+* XAMPP (opcional)
 * Visual Studio 2022 o VS Code
 
 ---
 
 ## Configuración de Base de Datos
 
-El script de creación de la base de datos se encuentra incluido en el repositorio : BDScript.sql
+Crear la base de datos:
 
-1. Abrir SQL Server Management Studio.
-2. Ejecutar el script SQL incluido.
-3. Verificar que la base de datos se haya creado correctamente.
+```sql
+CREATE DATABASE ferreteri;
+```
+
+Ejecutar el script incluido en el repositorio:
+
+```text
+BDScript.sql
+```
 
 ---
 
@@ -82,7 +81,7 @@ El script de creación de la base de datos se encuentra incluido en el repositor
 
 Editar el archivo:
 
-```json
+```text
 appsettings.json
 ```
 
@@ -91,7 +90,7 @@ Ejemplo:
 ```json
 {
   "ConnectionStrings": {
-    "CadenaSQL": "Server=SERVIDOR;Database=FERRETERI;Trusted_Connection=True;TrustServerCertificate=True;"
+    "Connection": "server=localhost;port=3306;database=ferreteri;user=root;password=;"
   }
 }
 ```
@@ -122,13 +121,13 @@ dotnet run
 
 ## Swagger
 
-Una vez iniciada la aplicación, acceder a:
+Una vez iniciada la aplicación acceder a:
 
 ```text
-https://localhost:{puerto}/swagger
+http://localhost:5016/swagger
 ```
 
-Desde Swagger se pueden probar todos los endpoints disponibles.
+o al puerto configurado en `launchSettings.json`.
 
 ---
 
@@ -143,8 +142,6 @@ Desde Swagger se pueden probar todos los endpoints disponibles.
 | POST   | /api/Categorias/add         |
 | DELETE | /api/Categorias/remove/{id} |
 
----
-
 ### Productos
 
 | Método | Endpoint                   |
@@ -154,8 +151,6 @@ Desde Swagger se pueden probar todos los endpoints disponibles.
 | POST   | /api/Productos/add         |
 | PUT    | /api/Productos/update      |
 | DELETE | /api/Productos/remove/{id} |
-
----
 
 ### Movimientos
 
@@ -169,16 +164,10 @@ Desde Swagger se pueden probar todos los endpoints disponibles.
 
 ## Registro de Movimientos
 
-La API registra movimientos relacionados con los productos para mantener un historial de cambios realizados en el inventario.
-
-Ejemplos:
-
-* Creación de productos
-* Actualización de productos
-* Eliminación de productos
+La API mantiene un historial de movimientos relacionados con los productos para llevar el control del inventario.
 
 ---
 
 ## Autor
 
-Proyecto desarrollado como práctica de ASP.NET Core Web API y SQL Server.
+Proyecto académico desarrollado con ASP.NET Core 8, Entity Framework Core y MySQL.
