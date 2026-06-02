@@ -33,8 +33,7 @@ namespace Ferreteri.Services
                 throw new KeyNotFoundException("La categoría asignada al producto no existe en la base de datos.");
 
             producto.FkIdCategoriaNavigation = null;
-            producto.Movimientos = null;
-
+            producto.Movimientos = new List<Movimiento>();
             await _dbSet.AddAsync(producto);
             await _context.SaveChangesAsync();
 
@@ -42,9 +41,8 @@ namespace Ferreteri.Services
             {
                 FkIdProd = producto.IdProd,
                 TipoMov = "CREACION".ToLowerInvariant(),
-                Cantidad = producto.Stock ?? 0,
-                Fecha = DateOnly.FromDateTime(DateTime.Now),
-                FkIdProdNavigation = null
+                Cantidad = producto.Stock,
+                Fecha = DateTime.Now
             };
 
             await _movimientosDbSet.AddAsync(movimiento);
@@ -81,7 +79,7 @@ namespace Ferreteri.Services
             }
 
             // Desvinculamos las listas virtuales de C# por seguridad
-            producto.Movimientos = null;
+            producto.Movimientos = new List<Movimiento>();
             producto.FkIdCategoriaNavigation = null;
 
             //Eliminamos el producto de forma limpia
@@ -106,21 +104,21 @@ namespace Ferreteri.Services
             if (productoActual == null)
                 return 0;
 
-            int stockAnterior = productoActual.Stock ?? 0;
+            int stockAnterior = productoActual.Stock;
 
             productoActual.Nombre = producto.Nombre;
             productoActual.Precio = producto.Precio;
             productoActual.Stock = producto.Stock;
             productoActual.FkIdCategoria = producto.FkIdCategoria;
 
-            if (stockAnterior != (producto.Stock ?? 0))
+            if (stockAnterior != producto.Stock)
             {
                 var movimiento = new Movimiento
                 {
                     FkIdProd = producto.IdProd,
                     TipoMov = "AJUSTE".ToLowerInvariant(),
-                    Cantidad = (producto.Stock ?? 0) - stockAnterior,
-                    Fecha = DateOnly.FromDateTime(DateTime.Now)
+                    Cantidad = producto.Stock - stockAnterior,
+                    Fecha = DateTime.Now
                 };
 
                 await _movimientosDbSet.AddAsync(movimiento);

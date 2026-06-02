@@ -38,33 +38,33 @@ namespace Ferreteri.Services
         public async Task<int> AddMovimiento(Movimiento movimiento)
         {
             movimiento.TipoMov = movimiento.TipoMov.ToUpper().Trim();
-            
+
             if (movimiento.TipoMov != "ENTRADA" && movimiento.TipoMov != "SALIDA")
             {
                 throw new ArgumentException("El tipo de movimiento debe ser 'ENTRADA' o 'SALIDA'.");
             }
 
             var producto = await _context.Productos.FindAsync(movimiento.FkIdProd);
-            if (producto == null) 
-            { 
+            if (producto == null)
+            {
                 throw new ArgumentException("El producto especificado no existe.");
             }
 
             if (movimiento.TipoMov == "ENTRADA")
             {
-                producto.Stock = (short)((producto.Stock ?? 0) + movimiento.Cantidad);
+                producto.Stock = producto.Stock + movimiento.Cantidad;
             }
             else if (movimiento.TipoMov == "SALIDA")
             {
                 //validamos si hay existencias
-                if ((producto.Stock ?? 0) < movimiento.Cantidad)
+                if (producto.Stock < movimiento.Cantidad)
                 {
                     throw new InvalidOperationException("No hay suficiente stock para realizar la salida.");
                 }
-                producto.Stock = (short)((producto.Stock ?? 0) - movimiento.Cantidad);
+                producto.Stock = producto.Stock - movimiento.Cantidad;
             }
 
-            movimiento.Fecha = DateOnly.FromDateTime(DateTime.Now);
+            movimiento.Fecha = DateTime.Now;
             _dbSet.Add(movimiento);
             _context.Entry(producto).State = EntityState.Modified;
 
