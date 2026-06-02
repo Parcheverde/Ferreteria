@@ -11,11 +11,11 @@ public partial class Producto
 
     public decimal Precio { get; set; }
 
-    public short? Stock { get; set; }
+    public int Stock { get; set; }
 
     public int? FkIdCategoria { get; set; }
 
     public virtual Categoria? FkIdCategoriaNavigation { get; set; }
 
-    public virtual ICollection<Movimiento>? Movimientos { get; set; } = new List<Movimiento>();
+    public virtual ICollection<Movimiento> Movimientos { get; set; } = new List<Movimiento>();
 }
