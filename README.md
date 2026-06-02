@@ -75,6 +75,7 @@ Ejecutar el script incluido en el repositorio:
 BDScript.sql
 ```
 
+ ayuda : https://youtu.be/zTU8DfDLxoI
 ---
 
 ## Configuración de la Cadena de Conexión
